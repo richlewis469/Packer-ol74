@@ -1,0 +1,16 @@
+References:
+	https://www.engineyard.com/blog/building-a-vagrant-box
+	https://github.com/boxcutter/oraclelinux
+	https://app.vagrantup.com/a-h/boxes/oracle_linux_7
+	https://github.com/a-h/atlas-oracle-linux-for-vagrant
+	https://oravirt.wordpress.com/2017/08/10/using-packer-to-build-a-vagrant-box/
+	https://adrianhesketh.com/2015/08/08/oracle-linux-7-on-vagrant-creating-a-new-base-box/
+	https://github.com/dbehnke/packer-oraclelinux-7
+
+	https://github.com/joefitzgerald/packer-windows
+	https://www.packer.io/docs/builders/virtualbox-iso.html
+
+
+
+Commands:
+	D:\Projects\Packer\packer-notes> packer build -only=virtualbox-iso packer-ol74.json

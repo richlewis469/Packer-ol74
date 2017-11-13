@@ -1,0 +1,63 @@
+{
+  "variables": {
+    "iso_location": ".",
+    "harddisk_size": "48000",
+    "vm_name": "ol74"
+  },
+  "builders": [{
+    "vm_name": "{{user `vm_name`}}",
+    "type": "virtualbox-iso",
+    "headless": false,
+
+    "guest_os_type": "Oracle_64",
+
+    "hard_drive_interface": "sata",
+    "disk_size": "{{user `harddisk_size`}}",
+
+    "iso_url": "{{user `iso_location`}}/Oracle-Linux-7u4-V921569-01.iso",
+    "iso_checksum": "298724f8eaa0dbf961c608c4965be70e",
+    "iso_checksum_type": "MD5",
+
+    "boot_command": [
+      "<tab> net.ifnames=0 biosdevname=0 text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ol74-ks.cfg<enter><wait>"
+    ],
+    "boot_wait": "12s",
+
+    "http_directory": "packer-http",
+
+    "virtualbox_version_file": "/tmp/.vbox_version",
+    "guest_additions_path": "/tmp/VBoxGuestAdditions_{{.Version}}.iso",
+
+    "ssh_username": "root",
+    "ssh_password": "vagrant",
+    "ssh_port": 22,
+    "ssh_wait_timeout": "10000s",
+
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--vram", "32"],
+      ["modifyvm", "{{.Name}}", "--memory", "1024"],
+      ["modifyvm", "{{.Name}}", "--cpus", "1"]
+    ],
+
+    "shutdown_command": "/sbin/halt -h -p"
+  }
+  ],
+  "provisioners": [
+  {
+    "type": "shell",
+    "scripts": [
+      "packer-scripts/vagrant.sh",
+      "packer-scripts/vboxguest.sh",
+      "packer-scripts/compact.sh"
+    ]
+  }
+  ],
+  "post-processors": [
+    {
+      "output": "build/{{user `vm_name`}}-x86_64-{{.Provider}}.box",
+      "compression_level": 6,
+      "type": "vagrant",
+      "only": ["virtualbox-iso"]
+    }
+  ]
+}

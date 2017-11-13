@@ -1,0 +1,62 @@
+{
+ "variables": {
+        "ssh_name": "root",
+        "ssh_pass": "vagrant",
+        "hostname": "ol74",
+       "outputfile": "ol74.box",
+       "compression" : "6"
+   },
+    "builders": [{
+        "type": "virtualbox-iso",
+        "guest_os_type": "Oracle_64",
+        "guest_additions_url": "",
+        "guest_additions_sha256": "",
+        "guest_additions_path": "",
+       "guest_additions_mode": "upload",
+       "output_directory": "packer-output-{{user `hostname`}}",
+        "vm_name": "packer-{{user `hostname`}}",
+        "vboxmanage": [
+           ["modifyvm", "{{.Name}}", "--vram", "32"],
+           ["modifyvm", "{{.Name}}", "--memory", "1024"] ,
+           ["modifyvm", "{{.Name}}", "--cpus", "1"]
+ ],
+ "hard_drive_interface" : "sata",
+        "disk_size": 32000,
+        "headless" : 0,
+        "iso_url": "Oracle-Linux-7u4-V921569-01.iso",
+        "iso_checksum": "298724f8eaa0dbf961c608c4965be70e",
+        "iso_checksum_type": "md5",
+        "http_directory" : "packer-http",
+        "http_port_min" : 8080,
+        "http_port_max" : 8082,
+        "ssh_username": "{{user `ssh_name`}}",
+        "ssh_password": "{{user `ssh_pass`}}",
+        "ssh_wait_timeout": "30m",
+        "shutdown_command": "shutdown -h now",
+        "shutdown_timeout": "40m",
+        "boot_wait": "5s",
+        "boot_command" : [
+            "<tab>",
+            " text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ol74-ks.cfg ",
+            "<enter>"
+        ]
+    }],
+  "provisioners"             : [{
+    "type": "shell",
+    "execute_command": "sh '{{ .Path }}'",
+    "scripts": [
+        "packer-scripts/yumconfig.sh",
+        "packer-scripts/vboxguest.sh",
+        "packer-scripts/vagrantuser.sh",
+        "packer-scripts/ipv6network.sh",
+        "packer-scripts/compact.sh"
+      ]
+  }],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "output": "{{user `outputfile`}}",
+      "compression_level": "{{user `compression`}}"
+    }
+  ]
+}
